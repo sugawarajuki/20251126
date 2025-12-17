@@ -2,6 +2,7 @@ import os
 import sqlite3
 from datetime import datetime
 import streamlit as st
+import traceback
 
 # ページ設定
 st.title("卓球用具の組み合わせ")
@@ -145,7 +146,7 @@ if st.button("保存"):
             with sqlite3.connect(db_path) as conn:
                 conn.execute(
                     "INSERT INTO combinations (playstyle, racket, rubber_front, rubber_back, notes, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                    (playstyle, rkt_val, rfront, rback, notes_val, datetime.now())
+                    (playstyle, rkt_val, rfront, rback, notes_val, datetime.now().isoformat())
                 )
                 conn.commit()
 
@@ -155,8 +156,9 @@ if st.button("保存"):
             st.session_state['racket'] = ''
             st.session_state['rubber_front'] = ''
             st.session_state['rubber_back'] = ''
-        except Exception as e:
-            st.error(f"保存中にエラーが発生しました: {e}")
+        except Exception:
+            # エラー発生時は UI に簡潔なメッセージのみ表示する
+            st.error("保存中にエラーが発生しました。")
 
 # 保存済み組み合わせ一覧
 st.subheader("保存済みの組み合わせ")
